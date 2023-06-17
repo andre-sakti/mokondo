@@ -81,6 +81,7 @@ clear
 MYIP=$(curl -sS ipv4.icanhazip.com)
 echo -e "\e[32mloading...\e[0m"
 clear
+
 # Valid Script
 VALIDITY () {
     today=`date -d "0 days" +"%Y-%m-%d"`
@@ -497,13 +498,6 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 EOF
-systemctl daemon-reload
-systemctl enable peler@vmess
-systemctl enable peler@trojan
-systemctl enable peler@vless
-systemctl restart peler@vmess
-systemctl restart peler@vless
-systemctl restart peler@trojan
 print_success "Konfigurasi Packet"
 }
 
@@ -611,11 +605,26 @@ print_install "Memasang SSH UDP"
 # // Installing UDP Mini
 mkdir -p /etc/Andre-Sakti/
 wget -q -O /etc/Andre-Sakti/udp "https://wunuit.github.io/project/udp"
-wget -q -O /etc/systemd/system/udp.service "https://wunuit.github.io/project/udp.service"
 wget -q -O /etc/Andre-Sakti/config.json "https://wunuit.github.io/project/config.json"
 chmod +x /etc/Andre-Sakti/udp
 chmod +x /etc/systemd/system/udp.service
 chmod +x /etc/Andre-Sakti/config.json
+cat >/etc/systemd/system/udp-custom.service <<EOF
+[Unit]
+Description=UDP 
+
+[Service]
+User=root
+Type=simple
+ExecStart=/etc/Andre-Sakti/udp server
+WorkingDirectory=/etc/Andre-Sakti/
+Restart=always
+RestartSec=2s
+
+[Install]
+WantedBy=default.target
+EOF
+systemctl daemon-reload
 systemctl enable udp
 systemctl start udp
 print_success "SSH UDP"
@@ -831,6 +840,12 @@ systemctl restart haproxy
     systemctl enable --now netfilter-persistent
     systemctl enable --now ws
     systemctl enable --now fail2ban
+    systemctl enable peler@vmess
+    systemctl enable peler@trojan
+    systemctl enable peler@vless
+    systemctl restart peler@vmess
+    systemctl restart peler@vless
+    systemctl restart peler@trojan
 history -c
 echo "unset HISTFILE" >> /etc/profile
 
