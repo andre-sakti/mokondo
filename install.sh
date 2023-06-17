@@ -304,6 +304,12 @@ function base_package() {
     
 }
 clear
+# Update and remove packages
+function neofetch() {
+   apt install neofetch
+   
+}
+clear
 # Fungsi input domain
 function pasang_domain() {
 echo -e ""
