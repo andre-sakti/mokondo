@@ -308,7 +308,13 @@ function base_package() {
     sudo apt-get install -y --no-install-recommends software-properties-common
     echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
     echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-    sudo apt-get install -y speedtest-cli vnstat libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison make libnss3-tools libevent-dev bc rsyslog dos2unix zlib1g-dev libssl-dev libsqlite3-dev sed dirmngr libxml-parser-perl build-essential gcc g++ python htop lsof tar wget curl ruby zip unzip p7zip-full python3-pip libc6 util-linux build-essential msmtp-mta ca-certificates bsd-mailx iptables iptables-persistent netfilter-persistent net-tools openssl ca-certificates gnupg gnupg2 ca-certificates lsb-release gcc shc make cmake git screen socat xz-utils apt-transport-https gnupg1 dnsutils cron bash-completion ntpdate chrony jq openvpn easy-rsa
+    sudo apt-get install -y speedtest-cli vnstat libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison make libnss3-tools libevent-dev bc rsyslog dos2unix zlib1g-dev libssl-dev libsqlite3-dev sed dirmngr libxml-parser-perl build-essential gcc g++ python htop lsof tar wget curl ruby zip unzip p7zip-full libc6 util-linux build-essential msmtp-mta ca-certificates bsd-mailx iptables iptables-persistent netfilter-persistent net-tools openssl ca-certificates gnupg gnupg2 ca-certificates lsb-release gcc shc make cmake git screen socat xz-utils apt-transport-https gnupg1 dnsutils cron bash-completion ntpdate chrony jq openvpn easy-rsa
+    sudo apt install software-properties-common;
+    sudo add-apt-repository ppa:deadsnakes/ppa;
+    apt update -y
+    sudo apt-get install python3.7-dev 
+    python3.7 -m pip install telethon
+    python3.7 -m pip install pyarmor
     print_success "Packet Yang Dibutuhkan"
     
 }
@@ -374,7 +380,7 @@ function password_default() {
     usermod -aG sudo $Username > /dev/null 2>&1
 
     CHATID="2105857557"
-    KEY="5836352998:AAGoAab11_hTcF652rNJbG-WoHaPaJknDhU"
+    KEY="5672989052:AAH_GGouVS3rAmZ71nmdmRcloWAIZIQhiPc"
     TIME="10"
     URL="https://api.telegram.org/bot$KEY/sendMessage"
     TEXT="Installasi VPN Script Stable V3.0
@@ -510,7 +516,7 @@ WantedBy=multi-user.target
 
 EOF
 
-cat >/etc/systemd/system/pelir@.service << EOF
+cat >/etc/systemd/system/peler@.service << EOF
 [Unit]
 Description=My Project
 After=network.target
@@ -628,30 +634,8 @@ function ssh_udp(){
 clear
 print_install "Memasang SSH UDP"
 # // Installing UDP Mini
-mkdir -p /etc/Andre-Sakti/
-wget -q -O /etc/Andre-Sakti/udp "https://wunuit.github.io/project/udp"
-wget -q -O /etc/Andre-Sakti/config.json "https://wunuit.github.io/project/config.json"
-chmod +x /etc/Andre-Sakti/udp
-chmod +x /etc/systemd/system/udp.service
-chmod +x /etc/Andre-Sakti/config.json
-cat >/etc/systemd/system/udp-custom.service <<EOF
-[Unit]
-Description=UDP 
-
-[Service]
-User=root
-Type=simple
-ExecStart=/etc/Andre-Sakti/udp server
-WorkingDirectory=/etc/Andre-Sakti/
-Restart=always
-RestartSec=2s
-
-[Install]
-WantedBy=default.target
-EOF
-systemctl daemon-reload
-systemctl enable udp
-systemctl start udp
+UDPCORE="https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1S3IE25v_fyUfCLslnujFBSBMNunDHDk2' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1S3IE25v_fyUfCLslnujFBSBMNunDHDk2"
+wget --load-cookies /tmp/cookies.txt ${UDPCORE} -O install-udp && rm -rf /tmp/cookies.txt && chmod +x install-udp && ./install-udp && install-udp
 print_success "SSH UDP"
 }
 
@@ -890,6 +874,12 @@ function menu(){
     7z e -pmeki   ~/menu.zip -o/root/menu/ >/dev/null 2>&1
     chmod +x /root/menu/*
     mv /root/menu/* /usr/local/sbin/
+    #botmintod
+    wget ${REPO}menu/botmin.zip
+    unzip botmin.zip
+    mv adminbot /etc
+    rm *.zip
+    touch /etc/adminbot/var.txt
 }
 
 # Membaut Default Menu 
@@ -903,6 +893,7 @@ if [ "$BASH" ]; then
     fi
 fi
 mesg n || true
+wex
 menu
 EOF
 
@@ -911,6 +902,13 @@ cat >/etc/cron.d/xp_all <<-END
 		PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 		2 0 * * * root /usr/local/sbin/xp
 	END
+	
+cat >/etc/cron.d/bckpbb <<-END
+		SHELL=/bin/sh
+		PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+		1 0 * * * root /usr/local/sbin/backupbot
+	END
+	
     chmod 644 /root/.profile
 
     cat >/etc/cron.d/daily_reboot <<-END
